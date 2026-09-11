@@ -10,6 +10,7 @@ import InstructorDashboard from './pages/InstructorDashboard';
 import CreateCourse from './pages/CreateCourse';
 import ManageCourse from './pages/ManageCourse';
 import CourseCatalog from './pages/CourseCatalog';
+import CourseDetails from './pages/CourseDetails';
 import MyEnrollments from './pages/MyEnrollments';
 import Recommendations from './pages/Recommendations';
 
@@ -23,6 +24,14 @@ export default function App() {
           <Routes>
 
             <Route path="/" element={<CourseCatalog />} />
+            <Route
+              path="/courses/:id"
+              element={
+                <ProtectedRoute>
+                  <CourseDetails />
+                </ProtectedRoute>
+              }
+            />
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route

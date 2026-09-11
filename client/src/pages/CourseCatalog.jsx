@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getAllCourses } from '../api/courseApi';
 import { enrollInCourse } from '../api/enrollmentApi';
@@ -52,9 +53,10 @@ export default function CourseCatalog() {
       <div className="card-grid">
         {courses.map((course) => (
           <div className="card" key={course._id}>
-            <h2>{course.title}</h2>
+            <h2><Link to={`/courses/${course._id}`}>{course.title}</Link></h2>
             <p>{course.description}</p>
             <p className="muted">Instructor: {course.instructor?.name}</p>
+            <Link to={`/courses/${course._id}`}>View details →</Link>
             {user?.role === 'student' && (
               <button
                 onClick={() => handleEnroll(course._id)}
