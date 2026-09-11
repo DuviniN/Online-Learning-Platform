@@ -1,6 +1,8 @@
 const express = require('express');
 const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
+const courseRoutes = require('./routes/courseRoutes');
+const enrollmentRoutes = require('./routes/enrollmentRoutes');
 
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
@@ -15,6 +17,8 @@ app.use(express.json());
 app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 
 app.use('/api/auth', authRoutes);
+app.use('/api/courses', courseRoutes);
+app.use('/api/enrollments', enrollmentRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

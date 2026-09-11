@@ -109,3 +109,163 @@ code {
   padding: 4px 8px;
   background: var(--code-bg);
 }
+
+a {
+  color: var(--accent);
+}
+
+.container {
+  flex: 1;
+  padding: 24px 32px 48px;
+  text-align: left;
+  box-sizing: border-box;
+}
+
+.navbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 32px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+.navbar .brand {
+  font-weight: 600;
+  color: var(--text-h);
+  text-decoration: none;
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.nav-links a {
+  text-decoration: none;
+}
+
+.user-tag {
+  color: var(--text-h);
+  font-size: 15px;
+}
+
+button,
+.btn-primary {
+  font: inherit;
+  cursor: pointer;
+  border: 1px solid var(--accent-border);
+  background: var(--accent);
+  color: #fff;
+  border-radius: 6px;
+  padding: 8px 16px;
+  text-decoration: none;
+  display: inline-block;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.dashboard {
+  text-align: left;
+}
+
+.dashboard-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
+.card-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+  gap: 16px;
+  margin-top: 24px;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.card h2 {
+  margin: 0;
+}
+
+.form-page {
+  max-width: 480px;
+  text-align: left;
+}
+
+.form-page form {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin: 16px 0;
+}
+
+.form-page label {
+  font-size: 14px;
+  color: var(--text-h);
+  margin-top: 8px;
+}
+
+.form-page input,
+.form-page select,
+.form-page textarea {
+  font: inherit;
+  padding: 8px 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+}
+
+.form-page button {
+  margin-top: 12px;
+  align-self: flex-start;
+}
+
+.table-section {
+  margin-top: 32px;
+}
+
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 12px;
+}
+
+th,
+td {
+  text-align: left;
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+th {
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+.error {
+  color: #d92d20;
+}
+
+.success {
+  color: #12b76a;
+}
+
+.muted {
+  color: var(--text);
+  font-size: 14px;
+}
