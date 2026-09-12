@@ -3,6 +3,7 @@ const cors = require('cors');
 const authRoutes = require('./routes/authRoutes');
 const courseRoutes = require('./routes/courseRoutes');
 const enrollmentRoutes = require('./routes/enrollmentRoutes');
+const recommendationRoutes = require('./routes/recommendationRoutes');
 
 const { notFound, errorHandler } = require('./middleware/errorMiddleware');
 
@@ -19,6 +20,7 @@ app.get('/api/health', (req, res) => res.json({ status: 'ok' }));
 app.use('/api/auth', authRoutes);
 app.use('/api/courses', courseRoutes);
 app.use('/api/enrollments', enrollmentRoutes);
+app.use('/api/recommendations', recommendationRoutes);
 
 app.use(notFound);
 app.use(errorHandler);

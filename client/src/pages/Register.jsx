@@ -22,28 +22,31 @@ export default function Register() {
   };
 
   return (
-    <div className="form-page">
-      <h1>Register</h1>
-      <form onSubmit={handleSubmit}>
-        <label>Name</label>
-        <input name="name" value={form.name} onChange={handleChange} required />
+    <div className="auth-page">
+      <div className="form-page">
+        <h1>Create your account</h1>
+        <p className="muted">Join as a student or an instructor.</p>
+        <form onSubmit={handleSubmit}>
+          <label>Name</label>
+          <input name="name" value={form.name} onChange={handleChange} required />
 
-        <label>Email</label>
-        <input type="email" name="email" value={form.email} onChange={handleChange} required />
+          <label>Email</label>
+          <input type="email" name="email" value={form.email} onChange={handleChange} required />
 
-        <label>Password</label>
-        <input type="password" name="password" value={form.password} onChange={handleChange} required minLength={6} />
+          <label>Password</label>
+          <input type="password" name="password" value={form.password} onChange={handleChange} required minLength={6} />
 
-        <label>I am a</label>
-        <select name="role" value={form.role} onChange={handleChange}>
-          <option value="student">Student</option>
-          <option value="instructor">Instructor</option>
-        </select>
+          <label>I am a</label>
+          <select name="role" value={form.role} onChange={handleChange}>
+            <option value="student">Student</option>
+            <option value="instructor">Instructor</option>
+          </select>
 
-        {error && <p className="error">{error}</p>}
-        <button type="submit">Register</button>
-      </form>
-      <p>Already have an account? <Link to="/login">Login here</Link></p>
+          {error && <p className="error">{error}</p>}
+          <button type="submit">Register</button>
+        </form>
+        <p>Already have an account? <Link to="/login">Login here</Link></p>
+      </div>
     </div>
   );
 }

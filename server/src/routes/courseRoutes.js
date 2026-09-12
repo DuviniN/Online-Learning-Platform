@@ -5,6 +5,7 @@ const {
   getMyCourses,
   getCourseById,
   updateCourse,
+  deleteCourse,
   getEnrolledStudents,
 } = require('../controllers/courseController');
 const { protect, authorize } = require('../middleware/authMiddleware');
@@ -17,5 +18,6 @@ router.get('/mine', protect, authorize('instructor'), getMyCourses);
 router.get('/:id/students', protect, authorize('instructor'), getEnrolledStudents);
 router.get('/:id', protect, getCourseById);
 router.put('/:id', protect, authorize('instructor'), updateCourse);
+router.delete('/:id', protect, authorize('instructor'), deleteCourse);
 
 module.exports = router;

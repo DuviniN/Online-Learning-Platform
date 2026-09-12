@@ -50,6 +50,20 @@ const updateCourse = asyncHandler(async (req, res) => {
   res.json(course);
 });
 
+// @route DELETE /api/courses/:id (instructor, must own the course)
+const deleteCourse = asyncHandler(async (req, res) => {
+  const course = await Course.findById(req.params.id);
+  if (!course) return res.status(404).json({ message: 'Course not found' });
+  if (course.instructor.toString() !== req.user._id.toString()) {
+    return res.status(403).json({ message: 'Not authorized to delete this course' });
+  }
+
+  await Enrollment.deleteMany({ course: course._id });
+  await course.deleteOne();
+
+  res.json({ message: 'Course deleted' });
+});
+
 // @route GET /api/courses/:id/students (instructor, must own the course)
 const getEnrolledStudents = asyncHandler(async (req, res) => {
   const course = await Course.findById(req.params.id);
@@ -79,5 +93,6 @@ module.exports = {
   getMyCourses,
   getCourseById,
   updateCourse,
+  deleteCourse,
   getEnrolledStudents,
 };

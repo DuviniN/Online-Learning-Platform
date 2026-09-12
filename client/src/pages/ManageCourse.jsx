@@ -1,15 +1,17 @@
 import { useEffect, useState } from 'react';
-import { useParams, Link } from 'react-router-dom';
-import { getCourseById, updateCourse, getEnrolledStudents } from '../api/courseApi';
+import { useParams, useNavigate, Link } from 'react-router-dom';
+import { getCourseById, updateCourse, deleteCourse, getEnrolledStudents } from '../api/courseApi';
 
 export default function ManageCourse() {
   const { id } = useParams();
+  const navigate = useNavigate();
   const [form, setForm] = useState({ title: '', description: '', content: '' });
   const [students, setStudents] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [saving, setSaving] = useState(false);
   const [saveMessage, setSaveMessage] = useState('');
+  const [deleting, setDeleting] = useState(false);
 
   useEffect(() => {
     let cancelled = false;
@@ -48,13 +50,35 @@ export default function ManageCourse() {
     }
   };
 
+  const handleDelete = async () => {
+    if (!window.confirm('Delete this course? This also removes all student enrollments in it. This cannot be undone.')) {
+      return;
+    }
+    setDeleting(true);
+    setError('');
+    try {
+      await deleteCourse(id);
+      navigate('/instructor/dashboard', { replace: true });
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to delete course');
+      setDeleting(false);
+    }
+  };
+
   if (loading) return <p>Loading course…</p>;
   if (error && !form.title) return <p className="error">{error}</p>;
 
   return (
     <section className="dashboard">
-      <h1>Manage Course</h1>
-      <p><Link to="/instructor/dashboard">← Back to dashboard</Link></p>
+      <div className="dashboard-header">
+        <div>
+          <h1>Manage Course</h1>
+          <p><Link to="/instructor/dashboard">← Back to dashboard</Link></p>
+        </div>
+        <button className="btn-danger" onClick={handleDelete} disabled={deleting}>
+          {deleting ? 'Deleting…' : 'Delete Course'}
+        </button>
+      </div>
 
       <div className="form-page">
         <h2>Course Details</h2>
