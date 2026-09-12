@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { getMyEnrollments } from '../api/enrollmentApi';
+import CourseCard from '../components/CourseCard';
 
 export default function MyEnrollments() {
   const [enrollments, setEnrollments] = useState([]);
@@ -25,18 +26,33 @@ export default function MyEnrollments() {
 
   return (
     <section className="dashboard">
-      <h1>My Enrollments</h1>
+      <div className="dashboard-header">
+        <div>
+          <h1>My Enrollments</h1>
+          <p className="muted">Courses you're currently enrolled in.</p>
+        </div>
+      </div>
+
+      {!loading && enrollments.length > 0 && (
+        <div className="stat-grid">
+          <div className="stat-card">
+            <div className="stat-value">{enrollments.length}</div>
+            <div className="stat-label">Enrolled courses</div>
+          </div>
+        </div>
+      )}
+
       {loading && <p>Loading…</p>}
       {error && <p className="error">{error}</p>}
       {!loading && enrollments.length === 0 && <p>You haven't enrolled in any courses yet.</p>}
 
-      <div className="card-grid">
+      <div className="course-grid">
         {enrollments.map((e) => (
-          <div className="card" key={e._id}>
-            <h2>{e.course?.title}</h2>
-            <p>{e.course?.description}</p>
-            <p className="muted">Enrolled on {new Date(e.createdAt).toLocaleDateString()}</p>
-          </div>
+          <CourseCard
+            key={e._id}
+            course={e.course}
+            footer={<span className="muted">Enrolled {new Date(e.createdAt).toLocaleDateString()}</span>}
+          />
         ))}
       </div>
     </section>

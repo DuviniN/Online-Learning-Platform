@@ -9,7 +9,7 @@ import StudentDashboard from './pages/StudentDashboard';
 import InstructorDashboard from './pages/InstructorDashboard';
 import CreateCourse from './pages/CreateCourse';
 import ManageCourse from './pages/ManageCourse';
-import CourseCatalog from './pages/CourseCatalog';
+import Home from './pages/Home';
 import CourseDetails from './pages/CourseDetails';
 import MyEnrollments from './pages/MyEnrollments';
 import Recommendations from './pages/Recommendations';
@@ -23,7 +23,7 @@ export default function App() {
         <main className="container">
           <Routes>
 
-            <Route path="/" element={<CourseCatalog />} />
+            <Route path="/" element={<Home />} />
             <Route
               path="/courses/:id"
               element={

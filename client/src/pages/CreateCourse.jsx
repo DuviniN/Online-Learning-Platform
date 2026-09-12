@@ -25,24 +25,26 @@ export default function CreateCourse() {
   };
 
   return (
-    <div className="form-page">
-      <h1>Add New Course</h1>
-      <form onSubmit={handleSubmit}>
-        <label>Title</label>
-        <input name="title" value={form.title} onChange={handleChange} required />
+    <div className="center-page">
+      <div className="form-page">
+        <h1>Add New Course</h1>
+        <form onSubmit={handleSubmit}>
+          <label>Title</label>
+          <input name="title" value={form.title} onChange={handleChange} required />
 
-        <label>Description</label>
-        <textarea name="description" value={form.description} onChange={handleChange} required rows={3} />
+          <label>Description</label>
+          <textarea name="description" value={form.description} onChange={handleChange} required rows={3} />
 
-        <label>Content</label>
-        <textarea name="content" value={form.content} onChange={handleChange} required rows={6} />
+          <label>Content</label>
+          <textarea name="content" value={form.content} onChange={handleChange} required rows={6} />
 
-        {error && <p className="error">{error}</p>}
-        <button type="submit" disabled={saving}>
-          {saving ? 'Creating…' : 'Create Course'}
-        </button>
-      </form>
-      <p><Link to="/instructor/dashboard">← Back to dashboard</Link></p>
+          {error && <p className="error">{error}</p>}
+          <button type="submit" disabled={saving}>
+            {saving ? 'Creating…' : 'Create Course'}
+          </button>
+        </form>
+        <p><Link to="/instructor/dashboard">← Back to dashboard</Link></p>
+      </div>
     </div>
   );
 }

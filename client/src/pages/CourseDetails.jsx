@@ -3,6 +3,8 @@ import { useParams, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getCourseById } from '../api/courseApi';
 import { enrollInCourse, getMyEnrollments } from '../api/enrollmentApi';
+import Avatar from '../components/Avatar';
+import { photoUrlFor, timeAgo } from '../utils/visuals';
 
 export default function CourseDetails() {
   const { id } = useParams();
@@ -53,24 +55,65 @@ export default function CourseDetails() {
   if (error && !course) return <p className="error">{error}</p>;
 
   return (
-    <section className="dashboard">
+    <section className="course-detail">
       <p><Link to="/">← Back to courses</Link></p>
-      <h1>{course.title}</h1>
-      <p className="muted">Instructor: {course.instructor?.name}</p>
 
-      <h2>Description</h2>
-      <p>{course.description}</p>
+      <div
+        className="course-detail-banner"
+        style={{
+          backgroundImage: `linear-gradient(180deg, rgba(15, 23, 42, 0.35), rgba(15, 23, 42, 0.65)), url('${photoUrlFor(course.title, 1200, 400)}')`,
+        }}
+      >
+        <span className="eyebrow eyebrow-on-dark">Course</span>
+        <h1>{course.title}</h1>
+        {course.instructor?.name && (
+          <p className="on-dark">
+            Taught by <strong>{course.instructor.name}</strong>
+            {course.createdAt && ` · Posted ${timeAgo(course.createdAt)}`}
+          </p>
+        )}
+      </div>
 
-      <h2>Content</h2>
-      <p>{course.content}</p>
+      <div className="course-detail-layout">
+        <div className="course-detail-main">
+          <section>
+            <h2>Description</h2>
+            <p>{course.description}</p>
+          </section>
+          <section>
+            <h2>What you'll learn</h2>
+            <p>{course.content}</p>
+          </section>
+        </div>
 
-      {error && <p className="error">{error}</p>}
+        <aside className="sidebar-card">
+          {course.instructor?.name && (
+            <div className="sidebar-instructor">
+              <Avatar name={course.instructor.name} size={40} />
+              <div>
+                <div className="sidebar-instructor-name">{course.instructor.name}</div>
+                <div className="muted">Instructor</div>
+              </div>
+            </div>
+          )}
 
-      {user?.role === 'student' && (
-        <button onClick={handleEnroll} disabled={enrolling || enrolled}>
-          {enrolled ? 'Enrolled' : enrolling ? 'Enrolling…' : 'Enroll'}
-        </button>
-      )}
+          <span className="badge-free badge-free-lg">Free enrollment</span>
+
+          {error && <p className="error">{error}</p>}
+
+          {user?.role === 'student' ? (
+            <button onClick={handleEnroll} disabled={enrolling || enrolled} className="btn-block">
+              {enrolled ? 'Enrolled ✓' : enrolling ? 'Enrolling…' : 'Enroll now'}
+            </button>
+          ) : !user ? (
+            <Link to="/login" className="btn-primary btn-block">Log in to enroll</Link>
+          ) : null}
+
+          {course.createdAt && (
+            <p className="muted sidebar-note">Posted {timeAgo(course.createdAt)}</p>
+          )}
+        </aside>
+      </div>
     </section>
   );
 }
