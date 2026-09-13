@@ -27,10 +27,14 @@ export function AuthProvider({ children }) {
     }
   };
 
-  const register = async (name, email, password, role) => {
+  const register = async (name, email, password, role, instructorCode) => {
     setLoading(true);
     try {
-      const { data } = await axiosClient.post('/auth/register', { name, email, password, role });
+      const payload = { name, email, password, role };
+      // Only sent when registering as an instructor — the backend validates
+      // it against a server-side secret and is the sole authority on the role.
+      if (role === 'instructor') payload.instructorCode = instructorCode;
+      const { data } = await axiosClient.post('/auth/register', payload);
       localStorage.setItem('token', data.token);
       setUser(data);
       return data;

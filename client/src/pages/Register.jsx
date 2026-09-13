@@ -6,23 +6,26 @@ import AuthLayout from '../components/AuthLayout';
 export default function Register() {
   const { register } = useAuth();
   const navigate = useNavigate();
-  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'student' });
+  const [form, setForm] = useState({ name: '', email: '', password: '', role: 'student', instructorCode: '' });
   const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
   const handleChange = (e) => setForm({ ...form, [e.target.name]: e.target.value });
-  const setRole = (role) => setForm({ ...form, role });
+  // Switching back to student clears any entered code so it's never sent for a student signup.
+  const setRole = (role) => setForm({ ...form, role, instructorCode: role === 'student' ? '' : form.instructorCode });
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
+    setSuccess('');
     setSubmitting(true);
     try {
-      await register(form.name, form.email, form.password, form.role);
-      navigate('/');
+      await register(form.name, form.email, form.password, form.role, form.instructorCode);
+      setSuccess('Registration successful.');
+      setTimeout(() => navigate('/'), 800);
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
-    } finally {
       setSubmitting(false);
     }
   };
@@ -50,6 +53,29 @@ export default function Register() {
               🧑‍🏫 Instructor
             </button>
           </div>
+
+          {form.role === 'instructor' && (
+            <>
+              <label>Instructor Registration Code</label>
+              <div className="input-group">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
+                     strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                  <rect x="4" y="10.5" width="16" height="10" rx="2" />
+                  <path d="M8 10.5V7a4 4 0 1 1 8 0v3.5" />
+                  <circle cx="12" cy="15.5" r="1.5" />
+                </svg>
+                <input
+                  type="password"
+                  name="instructorCode"
+                  value={form.instructorCode}
+                  onChange={handleChange}
+                  placeholder="Code provided by your institution"
+                  required
+                  autoComplete="off"
+                />
+              </div>
+            </>
+          )}
 
           <label>Name</label>
           <div className="input-group">
@@ -97,6 +123,7 @@ export default function Register() {
           </div>
 
           {error && <p className="error">{error}</p>}
+          {success && <p className="success">{success}</p>}
           <button type="submit" className="btn-block" disabled={submitting}>
             {submitting ? 'Creating account…' : 'Create account'}
           </button>
