@@ -36,7 +36,14 @@ export default function CreateCourse() {
           <textarea name="description" value={form.description} onChange={handleChange} required rows={3} />
 
           <label>Content</label>
-          <textarea name="content" value={form.content} onChange={handleChange} required rows={6} />
+          <textarea
+            name="content"
+            value={form.content}
+            onChange={handleChange}
+            placeholder={'One learning point per line, e.g.\nComponents and props\nState and hooks\nRouting between pages'}
+            required
+            rows={6}
+          />
 
           {error && <p className="error">{error}</p>}
           <button type="submit" disabled={saving}>

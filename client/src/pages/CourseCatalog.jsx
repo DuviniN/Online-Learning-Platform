@@ -4,6 +4,9 @@ import { useAuth } from '../context/AuthContext';
 import { getAllCourses } from '../api/courseApi';
 import { enrollInCourse } from '../api/enrollmentApi';
 import CourseCard from '../components/CourseCard';
+import EmptyState from '../components/EmptyState';
+
+const PAGE_SIZE = 9;
 
 export default function CourseCatalog() {
   const { user } = useAuth();
@@ -12,6 +15,7 @@ export default function CourseCatalog() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [query, setQuery] = useState(searchParams.get('q') || '');
+  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
   const [enrollingId, setEnrollingId] = useState(null);
   const [enrolledIds, setEnrolledIds] = useState(new Set());
 
@@ -22,6 +26,7 @@ export default function CourseCatalog() {
 
   const handleQueryChange = (value) => {
     setQuery(value);
+    setVisibleCount(PAGE_SIZE);
     setSearchParams(value ? { q: value } : {}, { replace: true });
   };
 
@@ -65,6 +70,9 @@ export default function CourseCatalog() {
     );
   }, [courses, query]);
 
+  const visibleCourses = filteredCourses.slice(0, visibleCount);
+  const hasMore = visibleCount < filteredCourses.length;
+
   return (
     <section className="dashboard">
       <h1>Explore Courses</h1>
@@ -88,11 +96,25 @@ export default function CourseCatalog() {
       {error && <p className="error">{error}</p>}
 
       {!loading && filteredCourses.length === 0 && (
-        <p>{query ? 'No courses match your search.' : 'No courses have been posted yet.'}</p>
+        <EmptyState
+          icon={
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+                 strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="11" cy="11" r="7" />
+              <path d="m20 20-3.5-3.5" />
+            </svg>
+          }
+          title={query ? 'No matching courses' : 'No courses yet'}
+          text={
+            query
+              ? `Nothing matched "${query}". Try a different search term.`
+              : 'Check back soon — instructors are still adding courses.'
+          }
+        />
       )}
 
       <div className="course-grid">
-        {filteredCourses.map((course) => (
+        {visibleCourses.map((course) => (
           <CourseCard
             key={course._id}
             course={course}
@@ -115,6 +137,17 @@ export default function CourseCatalog() {
           />
         ))}
       </div>
+
+      {hasMore && (
+        <div className="load-more">
+          <button className="btn-outline" onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}>
+            Load More Courses
+          </button>
+          <p className="muted">
+            Showing {visibleCourses.length} of {filteredCourses.length} courses
+          </p>
+        </div>
+      )}
     </section>
   );
 }

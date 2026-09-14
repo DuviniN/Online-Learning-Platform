@@ -13,6 +13,7 @@ import Home from './pages/Home';
 import CourseDetails from './pages/CourseDetails';
 import MyEnrollments from './pages/MyEnrollments';
 import Recommendations from './pages/Recommendations';
+import Profile from './pages/Profile';
 
 
 export default function App() {
@@ -29,6 +30,14 @@ export default function App() {
               element={
                 <ProtectedRoute>
                   <CourseDetails />
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/profile"
+              element={
+                <ProtectedRoute>
+                  <Profile />
                 </ProtectedRoute>
               }
             />

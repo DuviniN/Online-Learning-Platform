@@ -48,8 +48,14 @@ export function AuthProvider({ children }) {
     setUser(null);
   };
 
+  // Merges fresh fields (e.g. after a profile save) into the stored user so
+  // the navbar and any other consumer reflect the change immediately.
+  const updateUser = (partial) => {
+    setUser((prev) => (prev ? { ...prev, ...partial } : prev));
+  };
+
   return (
-    <AuthContext.Provider value={{ user, loading, login, register, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, updateUser }}>
       {children}
     </AuthContext.Provider>
   );

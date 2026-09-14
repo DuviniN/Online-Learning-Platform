@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
+import { Link } from 'react-router-dom';
 import { getMyEnrollments } from '../api/enrollmentApi';
 import CourseCard from '../components/CourseCard';
+import EmptyState from '../components/EmptyState';
 
 export default function MyEnrollments() {
   const [enrollments, setEnrollments] = useState([]);
@@ -44,7 +46,20 @@ export default function MyEnrollments() {
 
       {loading && <p>Loading…</p>}
       {error && <p className="error">{error}</p>}
-      {!loading && enrollments.length === 0 && <p>You haven't enrolled in any courses yet.</p>}
+
+      {!loading && enrollments.length === 0 && (
+        <EmptyState
+          icon={
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+                 strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19a1 1 0 0 1 1 1v14.5a1 1 0 0 1-1 1H6.5A2.5 2.5 0 0 0 4 22V5.5Z M4 17.5A2.5 2.5 0 0 1 6.5 15H20" />
+            </svg>
+          }
+          title="No enrollments yet"
+          text="Browse the catalog and enroll in a course to see it here."
+          action={<Link to="/" className="btn-primary">Browse courses</Link>}
+        />
+      )}
 
       <div className="course-grid">
         {enrollments.map((e) => (

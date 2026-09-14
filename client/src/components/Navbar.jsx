@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { NavLink, Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import Avatar from './Avatar';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
@@ -48,7 +49,10 @@ export default function Navbar() {
         {user?.role === 'instructor' && <NavLink to="/instructor">My Courses</NavLink>}
         {user ? (
           <>
-            <span className="user-tag">{user.name} ({user.role})</span>
+            <Link to="/profile" className="user-tag">
+              <Avatar name={user.name} size={24} />
+              {user.name}
+            </Link>
             <button onClick={handleLogout}>Logout</button>
           </>
         ) : (

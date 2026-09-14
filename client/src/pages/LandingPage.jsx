@@ -31,49 +31,27 @@ const FEATURES = [
 export default function LandingPage() {
   return (
     <div className="landing">
-      <section className="hero-band full-bleed">
-        <div className="hero-glow hero-glow-1" />
-        <div className="hero-glow hero-glow-2" />
-        <div className="section-inner hero-split">
-          <div className="hero-copy">
-            <span className="eyebrow">Online Learning Platform</span>
-            <h1>Learn new skills.<br />Teach what you know.</h1>
-            <p className="hero-sub">
-              Browse courses, enroll in a click, and get AI-powered recommendations tailored
-              to your goals — or create and manage your own courses as an instructor.
-            </p>
-            <div className="hero-actions">
-              <Link to="/register" className="btn-primary btn-lg">Get Started — it's free</Link>
-              <Link to="/login" className="btn-outline btn-lg">Log In</Link>
-            </div>
-          </div>
-
-          <div className="hero-visual" aria-hidden="true">
-            <div className="hero-card hero-card-1">
-              <div className="hero-card-thumb">
-                <img src={photoUrlFor('coding', 300, 160)} alt="" loading="lazy" />
-              </div>
-              <div className="hero-card-line w-80" />
-              <div className="hero-card-line w-50" />
-              <div className="hero-card-foot">
-                <span className="hero-card-dot" />
-                <div className="hero-card-line w-40" style={{ marginBottom: 0 }} />
-              </div>
-            </div>
-            <div className="hero-card hero-card-2">
-              <div className="hero-card-thumb">
-                <img src={photoUrlFor('graduation', 300, 160)} alt="" loading="lazy" />
-              </div>
-              <div className="hero-card-line w-80" />
-              <div className="hero-card-line w-60" />
-            </div>
-            <div className="hero-card hero-card-3">
-              <div className="hero-card-thumb">
-                <img src={photoUrlFor('teamwork', 300, 160)} alt="" loading="lazy" />
-              </div>
-              <div className="hero-card-line w-70" />
-              <div className="hero-card-line w-40" />
-            </div>
+      <section className="hero-band hero-video-band full-bleed">
+        <video
+          className="hero-video"
+          src="https://videos.pexels.com/video-files/7971029/7971029-hd_1280_720_30fps.mp4"
+          poster={photoUrlFor('graduation', 1280, 720)}
+          autoPlay
+          muted
+          loop
+          playsInline
+        />
+        <div className="hero-video-overlay" />
+        <div className="section-inner hero-copy hero-copy-video">
+          <span className="eyebrow eyebrow-on-dark">Online Learning Platform</span>
+          <h1>Learn new skills.<br />Teach what you know.</h1>
+          <p className="hero-sub on-dark">
+            Browse courses, enroll in a click, and get AI-powered recommendations tailored
+            to your goals — or create and manage your own courses as an instructor.
+          </p>
+          <div className="hero-actions">
+            <Link to="/register" className="btn-primary btn-lg">Get Started — it's free</Link>
+            <Link to="/login" className="btn-outline btn-lg">Log In</Link>
           </div>
         </div>
       </section>

@@ -77,7 +77,44 @@ const getMe = asyncHandler(async (req, res) => {
     name: req.user.name,
     email: req.user.email,
     role: req.user.role,
+    createdAt: req.user.createdAt,
   });
 });
 
-module.exports = { register, login, getMe };
+// @route PUT /api/auth/me
+// Updates the caller's own profile (name) and/or password. Email and role are
+// never accepted here — the backend stays the sole authority on both, the
+// same way it is for the instructor role at registration.
+const updateMe = asyncHandler(async (req, res) => {
+  const { name, currentPassword, newPassword } = req.body;
+  const user = await User.findById(req.user._id).select('+password');
+
+  if (name !== undefined) {
+    if (!name.trim()) {
+      return res.status(400).json({ message: 'Name cannot be empty' });
+    }
+    user.name = name.trim();
+  }
+
+  if (newPassword) {
+    if (!currentPassword || !(await user.comparePassword(currentPassword))) {
+      return res.status(401).json({ message: 'Current password is incorrect' });
+    }
+    if (newPassword.length < 6) {
+      return res.status(400).json({ message: 'New password must be at least 6 characters' });
+    }
+    user.password = newPassword;
+  }
+
+  await user.save();
+
+  res.json({
+    _id: user._id,
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    createdAt: user.createdAt,
+  });
+});
+
+module.exports = { register, login, getMe, updateMe };

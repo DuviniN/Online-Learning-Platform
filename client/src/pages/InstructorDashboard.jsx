@@ -3,6 +3,7 @@ import { Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getMyCourses, getEnrolledStudents } from '../api/courseApi';
 import CourseCard from '../components/CourseCard';
+import EmptyState from '../components/EmptyState';
 
 export default function InstructorDashboard() {
   const { user } = useAuth();
@@ -66,7 +67,17 @@ export default function InstructorDashboard() {
       {error && <p className="error">{error}</p>}
 
       {!loading && !error && courses.length === 0 && (
-        <p>You haven't posted any courses yet. Create your first one above.</p>
+        <EmptyState
+          icon={
+            <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
+                 strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M4 5.5A2.5 2.5 0 0 1 6.5 3H19a1 1 0 0 1 1 1v14.5a1 1 0 0 1-1 1H6.5A2.5 2.5 0 0 0 4 22V5.5Z M4 17.5A2.5 2.5 0 0 1 6.5 15H20" />
+            </svg>
+          }
+          title="No courses yet"
+          text="Create your first course to start teaching students on the platform."
+          action={<Link to="/instructor/courses/new" className="btn-primary">+ Add New Course</Link>}
+        />
       )}
 
       {!loading && courses.length > 0 && (

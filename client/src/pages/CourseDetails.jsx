@@ -6,6 +6,34 @@ import { enrollInCourse, getMyEnrollments } from '../api/enrollmentApi';
 import Avatar from '../components/Avatar';
 import { photoUrlFor, timeAgo } from '../utils/visuals';
 
+// Instructors write course content as free text. To show it clearly instead
+// of one dense paragraph, split it into distinct learning points: one per
+// line when the instructor already wrote it that way, otherwise fall back to
+// splitting a single comma-separated line (e.g. "Components, props, state").
+function parseContentItems(content) {
+  if (!content) return [];
+  const lines = content
+    .split(/\r?\n/)
+    .map((line) => line.trim().replace(/^[-•*]\s*/, ''))
+    .filter(Boolean);
+  if (lines.length > 1) return lines;
+
+  const commaParts = content
+    .split(',')
+    .map((part) => part.trim().replace(/^and\s+/i, ''))
+    .filter(Boolean);
+  if (commaParts.length >= 3) return commaParts;
+
+  return [content.trim()];
+}
+
+const CheckIcon = () => (
+  <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor"
+       strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+    <path d="m5 12.5 4.5 4.5L19 7" />
+  </svg>
+);
+
 export default function CourseDetails() {
   const { id } = useParams();
   const { user } = useAuth();
@@ -82,7 +110,14 @@ export default function CourseDetails() {
           </section>
           <section>
             <h2>What you'll learn</h2>
-            <p>{course.content}</p>
+            <div className="learn-grid">
+              {parseContentItems(course.content).map((item, i) => (
+                <div className="learn-item" key={i}>
+                  <CheckIcon />
+                  <span>{item}</span>
+                </div>
+              ))}
+            </div>
           </section>
         </div>
 
