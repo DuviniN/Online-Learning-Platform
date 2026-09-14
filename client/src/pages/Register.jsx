@@ -23,8 +23,8 @@ export default function Register() {
     setSubmitting(true);
     try {
       await register(form.name, form.email, form.password, form.role, form.instructorCode);
-      setSuccess('Registration successful.');
-      setTimeout(() => navigate('/'), 800);
+      setSuccess('Registration successful. Redirecting to login…');
+      setTimeout(() => navigate('/login'), 1000);
     } catch (err) {
       setError(err.response?.data?.message || 'Registration failed');
       setSubmitting(false);

@@ -27,6 +27,9 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // Registration does not log the user in — it only creates the account.
+  // The user then logs in explicitly from the login page with their new
+  // credentials, so no token/user is stored here.
   const register = async (name, email, password, role, instructorCode) => {
     setLoading(true);
     try {
@@ -35,8 +38,6 @@ export function AuthProvider({ children }) {
       // it against a server-side secret and is the sole authority on the role.
       if (role === 'instructor') payload.instructorCode = instructorCode;
       const { data } = await axiosClient.post('/auth/register', payload);
-      localStorage.setItem('token', data.token);
-      setUser(data);
       return data;
     } finally {
       setLoading(false);
