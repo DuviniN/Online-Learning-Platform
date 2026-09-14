@@ -13,7 +13,7 @@ in each one.
 | Backend | Node.js, Express 4 |
 | Database | MongoDB (Mongoose ODM) |
 | Auth | JWT (jsonwebtoken), bcryptjs for password hashing |
-| AI | OpenAI API (GPT) for course recommendations |
+| AI | OpenAI API (GPT), with automatic fallback to Groq if OpenAI is unavailable |
 
 ## Features
 
@@ -59,12 +59,20 @@ Request lifecycle for every call:
 6. Any thrown/rejected error is caught by `asyncHandler` and formatted by the central
    `errorHandler` middleware into a consistent `{ message }` JSON response.
 
+**AI provider fallback**: `POST /api/recommendations` tries OpenAI first. If OpenAI
+isn't configured, or the request fails for any reason (invalid/expired key, quota
+exceeded, an outage), it automatically retries with Groq — which exposes an
+OpenAI-compatible API, so the same `openai` SDK talks to both, just with a different
+`baseURL`, key, and model (see `config/aiProviders.js`). If neither provider is
+configured, the endpoint responds with `503` instead of crashing; if both are
+configured but both fail, it responds with `502`.
+
 ### Project structure
 
 ```
 server/
   src/
-    config/         # db.js (Mongo connection), openai.js (OpenAI client)
+    config/         # db.js (Mongo connection), aiProviders.js (OpenAI + Groq clients)
     controllers/     # authController, courseController, enrollmentController, recommendationController
     middleware/       # authMiddleware (protect, authorize), errorMiddleware
     models/           # User, Course, Enrollment
@@ -135,7 +143,9 @@ if they try to update, delete, or view enrollments for a course they don't own.
 
 Prerequisites: Node.js 18+, a MongoDB connection string (local or
 [MongoDB Atlas](https://www.mongodb.com/atlas)), and optionally an
-[OpenAI API key](https://platform.openai.com/api-keys) for recommendations.
+[OpenAI API key](https://platform.openai.com/api-keys) and/or a
+[Groq API key](https://console.groq.com/keys) (free) for recommendations — either one
+is enough, and OpenAI automatically falls back to Groq if it fails.
 
 ```bash
 git clone <repo-url>
@@ -146,7 +156,7 @@ cd Online-Learning-Platform
 ```bash
 cd server
 npm install
-cp .env.example .env   # then fill in MONGO_URI, JWT_SECRET, OPENAI_API_KEY
+cp .env.example .env   # then fill in MONGO_URI, JWT_SECRET, and OPENAI_API_KEY and/or GROQ_API_KEY
 npm run dev             # http://localhost:5000
 ```
 
