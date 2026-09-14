@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { getAllCourses } from '../api/courseApi';
@@ -12,10 +12,14 @@ export default function CourseCatalog() {
   const { user } = useAuth();
   const [searchParams, setSearchParams] = useSearchParams();
   const [courses, setCourses] = useState([]);
+  const [page, setPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [loadingMore, setLoadingMore] = useState(false);
   const [error, setError] = useState('');
   const [query, setQuery] = useState(searchParams.get('q') || '');
-  const [visibleCount, setVisibleCount] = useState(PAGE_SIZE);
+  const [debouncedQuery, setDebouncedQuery] = useState(query);
   const [enrollingId, setEnrollingId] = useState(null);
   const [enrolledIds, setEnrolledIds] = useState(new Set());
 
@@ -26,15 +30,27 @@ export default function CourseCatalog() {
 
   const handleQueryChange = (value) => {
     setQuery(value);
-    setVisibleCount(PAGE_SIZE);
     setSearchParams(value ? { q: value } : {}, { replace: true });
   };
 
+  // Debounce so every keystroke doesn't fire a request.
+  useEffect(() => {
+    const t = setTimeout(() => setDebouncedQuery(query), 350);
+    return () => clearTimeout(t);
+  }, [query]);
+
+  // Fetch page 1 whenever the (debounced) search term changes.
   useEffect(() => {
     let cancelled = false;
-    getAllCourses()
+    setLoading(true);
+    setError('');
+    getAllCourses({ page: 1, limit: PAGE_SIZE, search: debouncedQuery })
       .then((data) => {
-        if (!cancelled) setCourses(data);
+        if (cancelled) return;
+        setCourses(data.courses);
+        setPage(data.page);
+        setTotalPages(data.totalPages);
+        setTotalCount(data.totalCount);
       })
       .catch((err) => {
         if (!cancelled) setError(err.response?.data?.message || 'Failed to load courses');
@@ -45,7 +61,23 @@ export default function CourseCatalog() {
     return () => {
       cancelled = true;
     };
-  }, []);
+  }, [debouncedQuery]);
+
+  const handleLoadMore = async () => {
+    setLoadingMore(true);
+    setError('');
+    try {
+      const data = await getAllCourses({ page: page + 1, limit: PAGE_SIZE, search: debouncedQuery });
+      setCourses((prev) => [...prev, ...data.courses]);
+      setPage(data.page);
+      setTotalPages(data.totalPages);
+      setTotalCount(data.totalCount);
+    } catch (err) {
+      setError(err.response?.data?.message || 'Failed to load more courses');
+    } finally {
+      setLoadingMore(false);
+    }
+  };
 
   const handleEnroll = async (courseId) => {
     setEnrollingId(courseId);
@@ -60,18 +92,7 @@ export default function CourseCatalog() {
     }
   };
 
-  const filteredCourses = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    if (!q) return courses;
-    return courses.filter((c) =>
-      [c.title, c.description, c.instructor?.name].some((field) =>
-        field?.toLowerCase().includes(q)
-      )
-    );
-  }, [courses, query]);
-
-  const visibleCourses = filteredCourses.slice(0, visibleCount);
-  const hasMore = visibleCount < filteredCourses.length;
+  const hasMore = page < totalPages;
 
   return (
     <section className="dashboard">
@@ -95,7 +116,7 @@ export default function CourseCatalog() {
       {loading && <p>Loading courses…</p>}
       {error && <p className="error">{error}</p>}
 
-      {!loading && filteredCourses.length === 0 && (
+      {!loading && courses.length === 0 && (
         <EmptyState
           icon={
             <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor"
@@ -114,7 +135,7 @@ export default function CourseCatalog() {
       )}
 
       <div className="course-grid">
-        {visibleCourses.map((course) => (
+        {courses.map((course) => (
           <CourseCard
             key={course._id}
             course={course}
@@ -140,11 +161,11 @@ export default function CourseCatalog() {
 
       {hasMore && (
         <div className="load-more">
-          <button className="btn-outline" onClick={() => setVisibleCount((c) => c + PAGE_SIZE)}>
-            Load More Courses
+          <button className="btn-outline" onClick={handleLoadMore} disabled={loadingMore}>
+            {loadingMore ? 'Loading…' : 'Load More Courses'}
           </button>
           <p className="muted">
-            Showing {visibleCourses.length} of {filteredCourses.length} courses
+            Showing {courses.length} of {totalCount} courses
           </p>
         </div>
       )}

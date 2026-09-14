@@ -4,6 +4,7 @@ import { getMe, updateMe } from '../api/userApi';
 import { getMyEnrollments } from '../api/enrollmentApi';
 import { getMyCourses, getEnrolledStudents } from '../api/courseApi';
 import Avatar from '../components/Avatar';
+import { PASSWORD_MIN_LENGTH, PASSWORD_PATTERN, PASSWORD_HINT } from '../utils/passwordRules';
 
 const MailIcon = () => (
   <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor"
@@ -131,19 +132,22 @@ export default function Profile() {
 
   return (
     <section className="dashboard">
-      <div className="profile-header">
-        <Avatar name={profile?.name} size={72} />
-        <div>
-          <h1>{profile?.name}</h1>
-          <span className={`role-badge role-badge-${profile?.role}`}>
-            {profile?.role === 'instructor' ? '🧑‍🏫 Instructor' : '🎓 Student'}
-          </span>
-          <p className="muted">{profile?.email}</p>
-          {profile?.createdAt && (
-            <p className="muted">
-              Member since {new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
-            </p>
-          )}
+      <div className="profile-banner">
+        <div className="profile-banner-glow" />
+        <div className="profile-header">
+          <Avatar name={profile?.name} size={84} className="profile-avatar-ring" />
+          <div>
+            <h1>{profile?.name}</h1>
+            <span className={`role-badge role-badge-${profile?.role}`}>
+              {profile?.role === 'instructor' ? '🧑‍🏫 Instructor' : '🎓 Student'}
+            </span>
+            <p className="muted">{profile?.email}</p>
+            {profile?.createdAt && (
+              <p className="muted">
+                Member since {new Date(profile.createdAt).toLocaleDateString('en-US', { month: 'long', year: 'numeric' })}
+              </p>
+            )}
+          </div>
         </div>
       </div>
 
@@ -164,7 +168,10 @@ export default function Profile() {
 
       <div className="profile-grid">
         <div className="form-page">
-          <h2>Edit Profile</h2>
+          <div className="form-section-title">
+            <span className="form-section-icon"><UserIcon /></span>
+            <h2>Edit Profile</h2>
+          </div>
           <form onSubmit={handleProfileSubmit}>
             <label>Full Name</label>
             <div className="input-group">
@@ -187,7 +194,10 @@ export default function Profile() {
         </div>
 
         <div className="form-page">
-          <h2>Change Password</h2>
+          <div className="form-section-title">
+            <span className="form-section-icon form-section-icon-danger"><LockIcon /></span>
+            <h2>Change Password</h2>
+          </div>
           <form onSubmit={handlePasswordSubmit}>
             <label>Current Password</label>
             <div className="input-group">
@@ -208,9 +218,12 @@ export default function Profile() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
-                minLength={6}
+                minLength={PASSWORD_MIN_LENGTH}
+                pattern={PASSWORD_PATTERN}
+                title={PASSWORD_HINT}
               />
             </div>
+            <p className="field-hint">{PASSWORD_HINT}</p>
 
             <label>Confirm New Password</label>
             <div className="input-group">
@@ -220,7 +233,7 @@ export default function Profile() {
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
-                minLength={6}
+                minLength={PASSWORD_MIN_LENGTH}
               />
             </div>
 

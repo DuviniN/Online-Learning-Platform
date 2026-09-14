@@ -2,6 +2,7 @@ import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import AuthLayout from '../components/AuthLayout';
+import { PASSWORD_MIN_LENGTH, PASSWORD_PATTERN, PASSWORD_HINT } from '../utils/passwordRules';
 
 export default function Register() {
   const { register } = useAuth();
@@ -116,11 +117,14 @@ export default function Register() {
               name="password"
               value={form.password}
               onChange={handleChange}
-              placeholder="At least 6 characters"
+              placeholder="At least 8 characters"
               required
-              minLength={6}
+              minLength={PASSWORD_MIN_LENGTH}
+              pattern={PASSWORD_PATTERN}
+              title={PASSWORD_HINT}
             />
           </div>
+          <p className="field-hint">{PASSWORD_HINT}</p>
 
           {error && <p className="error">{error}</p>}
           {success && <p className="success">{success}</p>}

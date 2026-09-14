@@ -2,6 +2,7 @@ const crypto = require('crypto');
 const User = require('../models/User');
 const generateToken = require('../utils/generateToken');
 const asyncHandler = require('../utils/asyncHandler');
+const { validatePassword } = require('../utils/validatePassword');
 
 // Fixed-length digest comparison so timingSafeEqual never throws on mismatched
 // input length, and the comparison time doesn't leak the code's length either.
@@ -17,6 +18,11 @@ const register = asyncHandler(async (req, res) => {
 
   if (!name || !email || !password) {
     return res.status(400).json({ message: 'Name, email and password are required' });
+  }
+
+  const passwordError = validatePassword(password);
+  if (passwordError) {
+    return res.status(400).json({ message: passwordError });
   }
 
   const wantsInstructor = role === 'instructor';
@@ -100,8 +106,9 @@ const updateMe = asyncHandler(async (req, res) => {
     if (!currentPassword || !(await user.comparePassword(currentPassword))) {
       return res.status(401).json({ message: 'Current password is incorrect' });
     }
-    if (newPassword.length < 6) {
-      return res.status(400).json({ message: 'New password must be at least 6 characters' });
+    const passwordError = validatePassword(newPassword);
+    if (passwordError) {
+      return res.status(400).json({ message: passwordError });
     }
     user.password = newPassword;
   }

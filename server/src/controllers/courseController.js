@@ -1,6 +1,13 @@
 const Course = require('../models/Course');
 const Enrollment = require('../models/Enrollment');
+const User = require('../models/User');
 const asyncHandler = require('../utils/asyncHandler');
+
+// Escapes regex special characters in user-supplied search text so it's safe
+// to interpolate into a MongoDB $regex (prevents regex-injection / ReDoS).
+function escapeRegex(str) {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+}
 
 // @route POST /api/courses (instructor)
 const createCourse = asyncHandler(async (req, res) => {
@@ -15,9 +22,42 @@ const createCourse = asyncHandler(async (req, res) => {
 });
 
 // @route GET /api/courses (any authenticated user — course catalog)
+// Supports pagination (?page=&limit=) and search (?search=), matched against
+// course title/description or the instructor's name, all at the database level
+// so the full catalog is never loaded into memory just to show one page of it.
 const getAllCourses = asyncHandler(async (req, res) => {
-  const courses = await Course.find().populate('instructor', 'name email').sort('-createdAt');
-  res.json(courses);
+  const page = Math.max(parseInt(req.query.page, 10) || 1, 1);
+  const limit = Math.min(Math.max(parseInt(req.query.limit, 10) || 9, 1), 50);
+  const search = (req.query.search || '').trim();
+
+  let filter = {};
+  if (search) {
+    const regex = new RegExp(escapeRegex(search), 'i');
+    const matchingInstructors = await User.find({ role: 'instructor', name: regex }).select('_id');
+    filter = {
+      $or: [
+        { title: regex },
+        { description: regex },
+        { instructor: { $in: matchingInstructors.map((u) => u._id) } },
+      ],
+    };
+  }
+
+  const [courses, totalCount] = await Promise.all([
+    Course.find(filter)
+      .populate('instructor', 'name email')
+      .sort('-createdAt')
+      .skip((page - 1) * limit)
+      .limit(limit),
+    Course.countDocuments(filter),
+  ]);
+
+  res.json({
+    courses,
+    page,
+    totalPages: Math.max(Math.ceil(totalCount / limit), 1),
+    totalCount,
+  });
 });
 
 // @route GET /api/courses/mine (instructor's own courses)
